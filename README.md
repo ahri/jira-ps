@@ -1,4 +1,5 @@
-# JIRA PowerShell Toolkit #
+JIRA PowerShell Toolkit
+=======================
 
 This is pretty rough at the moment and offers the bare minimum to be able to
 construct PowerShell scripts that can access JIRA in a convenient manner.
