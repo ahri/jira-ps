@@ -1,5 +1,5 @@
 ﻿$path = Split-Path ($MyInvocation.MyCommand.Definition) -Parent
-Import-Module $path\Jira -Force
+Import-Module $path\Jira
 
 $workflow = "Reopened", "Open", "In Progress", "Resolved", "Tested"
 $json = Get-JiraSearchResult 'fixVersion = "ILB Core Backlog" and Sprint in openSprints() and type in ("User Story", Defect) order by Rank'
@@ -13,8 +13,8 @@ Function Get-WorkflowIndex($status) {
     Return $idx
 }
 
-Function Write-IssueTasks($issue) {
-    Write-Host $issue.key + " " + $issue.fields.summary
+Function Write-IssueTaskStatuses($issue) {
+    Write-Host $issue.key $issue.fields.summary
     Foreach ($subtask in $issue.fields.subtasks) {
         "    " + $subtask.key + " " + $subtask.fields.status.name
     }
@@ -24,7 +24,8 @@ Function Write-IssueTasks($issue) {
     Write-Host
 }
 
-Foreach ($issue in $json.issues) {
+
+Function Invoke-CheckWorkflow($issue) {
     $issue_idx = Get-WorkflowIndex $issue.fields.status.name
     $lcd = $workflow.Count
 
@@ -39,12 +40,31 @@ Foreach ($issue in $json.issues) {
         }
     }
 
-    if (($lcd -ne $issue_idx) -and
+    If (($lcd -ne $issue_idx) -and
 
         # Specifically exclude the situation where an issue is reopened and an open task exists
         !(($issue_idx -eq (Get-WorkflowIndex "Reopened")) -and
           ($lcd -eq (Get-WorkflowIndex "Open")))) {
 
-        Write-IssueTasks $issue
+        Write-IssueTaskStatuses $issue
     }
+}
+
+Function Invoke-CheckWorkWithoutEstimates($issue) {
+    If (($issue.fields.aggregatetimeoriginalestimate -eq $Null) -and $issue.fields.aggregateprogress.progress -gt 0) {
+        Write-Host $issue.key "has time logged against it but no estimate."
+    }
+}
+
+Function Invoke-CheckResolvedWithTimeLeft($issue) {
+    If ((($issue.fields.status.name -eq "Resolved") -or ($issue.fields.status.name -eq "Tested")) -and $issue.fields.aggregatetimeestimate -gt 0) {
+        Write-Host $issue.key "is at status Tested with time left to close off."
+    }
+}
+
+
+Foreach ($issue in $json.issues) {
+    Invoke-CheckWorkflow $issue
+    Invoke-CheckWorkWithoutEstimates $issue
+    Invoke-CheckResolvedWithTimeLeft $issue
 }
