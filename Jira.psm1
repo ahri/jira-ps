@@ -28,6 +28,10 @@ Function Get-JiraIssue($issue) {
     Return Invoke-JiraRequest GET "issue/$(ConvertTo-SafeUri $issue)"
 }
 
+Function Get-JiraHistory($issue) {
+    Return Invoke-JiraRequest GET "issue/$(ConvertTo-SafeUri $issue)?expand=changelog"
+}
+
 Function Get-JiraSearchResult($query) {
     Return Invoke-JiraRequest GET "search?jql=$(ConvertTo-SafeUri $query)"
 }
@@ -36,4 +40,5 @@ Export-ModuleMember -Function Set-JiraCredentials,
                               ConvertTo-SafeUri,
                               Invoke-JiraQuery,
                               Get-JiraIssue,
+                              Get-JiraHistory,
                               Get-JiraSearchResult
