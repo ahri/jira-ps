@@ -32,4 +32,8 @@ Function Get-JiraSearchResult($query) {
     Return Invoke-JiraRequest GET "search?jql=$(ConvertTo-SafeUri $query)"
 }
 
-Export-ModuleMember -Function Set-JiraCredentials, ConvertTo-SafeUri, Invoke-JiraQuery, Get-JiraIssue, Get-JiraSearchResult
+Export-ModuleMember -Function Set-JiraCredentials,
+                              ConvertTo-SafeUri,
+                              Invoke-JiraQuery,
+                              Get-JiraIssue,
+                              Get-JiraSearchResult
