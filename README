@@ -15,10 +15,10 @@ Environment in base64 encoded form:
 
     > Set-JiraCredentials
 
-cmdlet Set-JiraCredentials at command pipeline position 1
-Supply values for the following parameters:
-username: adam.piper
-password:
+    cmdlet Set-JiraCredentials at command pipeline position 1
+    Supply values for the following parameters:
+    username: adam.piper
+    password:
 
 
 Now you can use the provided Get-JiraIssue function:
